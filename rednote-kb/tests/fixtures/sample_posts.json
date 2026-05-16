@@ -1,0 +1,62 @@
+[
+  {
+    "id": "fixture-001",
+    "url": "https://www.xiaohongshu.com/explore/fixture-001",
+    "title": "上海徐汇区 brunch 推荐 ☕",
+    "body": "周末和朋友去了几家徐汇区的 brunch，最爱的是衡山路那家小店，鸡蛋班尼迪克做得超棒，咖啡也很好喝。环境安静，适合慢慢聊天。人均 ¥120 左右。",
+    "tags": ["上海", "brunch", "徐汇", "咖啡"],
+    "author": {"id": "a1", "nickname": "周末探店", "handle": "weekend_eats"},
+    "like_count": 1820,
+    "collect_count": 945,
+    "published_at": "2026-03-12T10:00:00Z",
+    "source": "creator"
+  },
+  {
+    "id": "fixture-002",
+    "url": "https://www.xiaohongshu.com/explore/fixture-002",
+    "title": "敏感肌护肤分享｜油皮也能用",
+    "body": "用了三个月的护肤组合，痘痘明显减少。早C晚A真的有用，但要慢慢建立耐受。推荐入门款：薇诺娜的舒敏霜，含有马齿苋成分，敏感期救命。",
+    "tags": ["护肤", "敏感肌", "油皮"],
+    "author": {"id": "a2", "nickname": "护肤小白", "handle": "skin_basics"},
+    "like_count": 3540,
+    "collect_count": 2100,
+    "published_at": "2026-04-02T15:30:00Z",
+    "source": "creator"
+  },
+  {
+    "id": "fixture-003",
+    "url": "https://www.xiaohongshu.com/explore/fixture-003",
+    "title": "日本京都 5 日游攻略",
+    "body": "5 月去的京都，赶上了新绿季。住在祇园附近，走路去清水寺很方便。岚山的竹林一定要早上去，9 点之前几乎没人。建议买一张 ICOCA 卡，公交地铁通用。",
+    "tags": ["日本", "京都", "旅行攻略"],
+    "author": {"id": "a3", "nickname": "旅行手帐", "handle": "travel_notes"},
+    "like_count": 8920,
+    "collect_count": 6700,
+    "published_at": "2026-05-08T08:00:00Z",
+    "source": "creator"
+  },
+  {
+    "id": "fixture-004",
+    "url": "https://www.xiaohongshu.com/explore/fixture-004",
+    "title": "10 分钟早餐｜燕麦杯做法",
+    "body": "前一晚把燕麦、牛奶、奇亚籽、蓝莓放进玻璃罐，冷藏一夜。第二天加点蜂蜜和坚果，营养又顶饱。可以提前做 3 罐，工作日早上直接拿走。",
+    "tags": ["早餐", "燕麦", "懒人食谱"],
+    "author": {"id": "a4", "nickname": "厨房日记", "handle": "kitchen_diary"},
+    "like_count": 1240,
+    "collect_count": 890,
+    "published_at": "2026-02-20T07:00:00Z",
+    "source": "seed_query"
+  },
+  {
+    "id": "fixture-005",
+    "url": "https://www.xiaohongshu.com/explore/fixture-005",
+    "title": "上海武康路一日游 city walk 路线",
+    "body": "从武康大楼出发，沿着武康路走到湖南路，咖啡店一家挨着一家。中间可以拐进巴金故居看看，免费。最后到衡山路坐 1 号线回家。整条路两公里，慢慢逛要三四个小时。",
+    "tags": ["上海", "city walk", "武康路", "周末"],
+    "author": {"id": "a1", "nickname": "周末探店", "handle": "weekend_eats"},
+    "like_count": 5600,
+    "collect_count": 3210,
+    "published_at": "2026-04-18T11:00:00Z",
+    "source": "creator"
+  }
+]

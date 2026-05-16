@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}小红书 KB · 搜索{% endblock %}
+{% block main %}
+<form class="search" onsubmit="event.preventDefault(); doSearch();">
+  <input id="q" type="search" name="q" placeholder="搜索…" autocomplete="off" autofocus
+         autocapitalize="off" enterkeyhint="search">
+</form>
+<p class="stats">{{ stats.posts }} posts · {{ stats.authors }} authors</p>
+<ul id="results" class="results"></ul>
+<script src="./static/search.js"></script>
+{% endblock %}

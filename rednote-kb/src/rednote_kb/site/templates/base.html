@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>{% block title %}小红书 KB{% endblock %}</title>
+<link rel="stylesheet" href="{{ static_prefix|default('./static') }}/style.css">
+</head>
+<body>
+<header>
+  <a class="brand" href="{{ home|default('./index.html') }}">小红书 KB</a>
+  <span class="meta">built {{ built_at }}</span>
+</header>
+<main>
+{% block main %}{% endblock %}
+</main>
+</body>
+</html>
