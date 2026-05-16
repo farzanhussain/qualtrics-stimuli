@@ -114,9 +114,12 @@ def build(db_path: Path, dist: Path) -> dict:
     # Render post pages from the full records (with body + ocr).
     posts_dir = dist / "p"
     posts_dir.mkdir(exist_ok=True)
+    fresh_html: set[str] = set()
     for p in posts:
         view = {k: v for k, v in p.items() if k != "_t"}
-        (posts_dir / f"{p['id']}.html").write_text(
+        fname = f"{p['id']}.html"
+        fresh_html.add(fname)
+        (posts_dir / fname).write_text(
             post_tmpl.render(
                 post=view,
                 built_at=built_at,
@@ -126,6 +129,12 @@ def build(db_path: Path, dist: Path) -> dict:
             ),
             encoding="utf-8",
         )
+    # Clean up stale per-post HTML from prior builds. Without this, deleted or
+    # renamed posts linger as ghost pages after a rebuild — broken from the
+    # search index but discoverable via crawled/old links.
+    for existing in posts_dir.iterdir():
+        if existing.is_file() and existing.suffix == ".html" and existing.name not in fresh_html:
+            existing.unlink()
 
     # Strip full body/ocr from the shipped search index — display uses excerpts.
     search_posts = []

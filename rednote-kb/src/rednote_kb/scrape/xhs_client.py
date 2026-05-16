@@ -47,9 +47,17 @@ def _now() -> str:
 def normalise(raw: dict, default_source: str = "manual") -> dict:
     if "id" not in raw or "url" not in raw:
         raise ValueError(f"post missing required id/url: {raw!r:.120}")
+    pid = str(raw["id"]).strip()
+    # Reject ids that are empty, dot/dot-dot, or contain path separators / NUL.
+    # These would collide on SQLite PK (empty), escape dist/p/ (slashes, ..), or
+    # produce broken filenames (NUL). Cheaper to reject at ingress than sanitise
+    # everywhere downstream.
+    if (not pid or pid in (".", "..")
+            or any(c in pid for c in ("/", "\\", "\x00"))):
+        raise ValueError(f"post id is empty or unsafe for use as filename: {raw.get('id')!r}")
     author = raw.get("author") or {}
     return {
-        "id":            str(raw["id"]),
+        "id":            pid,
         "url":           raw["url"],
         "title":         raw.get("title", "") or "",
         "body":          raw.get("body", "") or "",
