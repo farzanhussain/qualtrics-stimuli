@@ -12,10 +12,7 @@ from rednote_kb.site import build as site_build
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_posts.json"
 
 
-def test_build_from_fixture(tmp_path: Path) -> None:
-    db = tmp_path / "rednote.db"
-    dist = tmp_path / "dist"
-
+def _ingest_fixture(db: Path) -> int:
     raws = xhs_client.load_json_file(FIXTURE)
     with dao.session(db) as conn:
         for raw in raws:
@@ -28,25 +25,51 @@ def test_build_from_fixture(tmp_path: Path) -> None:
                     "followed": 1,
                 })
             dao.upsert_post(conn, post)
+    return len(raws)
+
+
+def test_build_from_fixture(tmp_path: Path) -> None:
+    db = tmp_path / "rednote.db"
+    dist = tmp_path / "dist"
+    n = _ingest_fixture(db)
 
     result = site_build.build(db, dist)
-    assert result["posts"] == len(raws)
+    assert result["posts"] == n
+    assert result["tokens"] > 0
 
     index_html = (dist / "index.html").read_text("utf-8")
     assert "小红书 KB" in index_html
-    assert f"{len(raws)} posts" in index_html
+    assert f"{n} posts" in index_html
+    assert "manifest.webmanifest" in index_html
 
     payload = json.loads((dist / "posts.json").read_text("utf-8"))
     assert payload["v"] == site_build.SITE_VERSION
-    assert len(payload["posts"]) == len(raws)
+    assert len(payload["posts"]) == n
     titles = {p["title"] for p in payload["posts"]}
     assert "日本京都 5 日游攻略" in titles
 
+    # Per-field token sets shipped, but raw body/ocr stripped from search payload.
+    p0 = payload["posts"][0]
+    assert "_t" in p0 and {"title", "body", "tag", "author"}.issubset(p0["_t"])
+    assert "body" not in p0, "raw body should be stripped from search index"
+    assert "ocr_text" not in p0
+
+    # Inverted index covers known terms.
+    assert "京" in payload["tok"]
+    assert "brunch" in payload["tok"]
+    assert isinstance(payload["tok"]["京"], list)
+
     assert (dist / "p" / "fixture-001.html").exists()
     post_html = (dist / "p" / "fixture-001.html").read_text("utf-8")
-    assert "../static/style.css" in post_html, "post page must reference static one level up"
+    assert "../static/style.css" in post_html
     assert "../index.html" in post_html
+    assert "../manifest.webmanifest" in post_html
+    assert "周末和朋友" in post_html  # full body rendered on post page
 
+    # PWA assets at site root, not under static/.
+    assert (dist / "manifest.webmanifest").exists()
+    assert (dist / "sw.js").exists()
+    assert (dist / "icon.svg").exists()
     assert (dist / "static" / "search.js").exists()
     assert (dist / "static" / "style.css").exists()
     assert (dist / "robots.txt").read_text("utf-8").startswith("User-agent: *")
@@ -69,3 +92,16 @@ def test_upsert_is_idempotent(tmp_path: Path) -> None:
                 dao.upsert_post(conn, post)
         st = dao.stats(conn)
     assert st["posts"] == len(raws)
+
+
+def test_empty_db_builds_cleanly(tmp_path: Path) -> None:
+    """Pipeline must not crash on an empty database — the canary expects this."""
+    db = tmp_path / "rednote.db"
+    dist = tmp_path / "dist"
+    result = site_build.build(db, dist)
+    assert result["posts"] == 0
+    payload = json.loads((dist / "posts.json").read_text("utf-8"))
+    assert payload["posts"] == []
+    assert payload["tok"] == {}
+    assert (dist / "index.html").exists()
+    assert (dist / "sw.js").exists()

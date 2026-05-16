@@ -1,0 +1,25 @@
+# Install as a user service:
+#   mkdir -p ~/.config/systemd/user
+#   cp systemd/rednote-build.{service,timer} ~/.config/systemd/user/
+#   loginctl enable-linger $USER   # so the timer fires while you're logged out
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now rednote-build.timer
+#   systemctl --user list-timers
+# Logs: journalctl --user -u rednote-build.service -f
+#
+# Edit WorkingDirectory + ExecStart paths before installing.
+
+[Unit]
+Description=RedNote KB scheduled rebuild (canary + scrape if configured + build + deploy)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/code/rednote-kb
+EnvironmentFile=-%h/code/rednote-kb/.env
+ExecStart=/bin/bash -lc 'uv run python scripts/canary.py && uv run rednote-kb build && bash scripts/deploy.sh'
+Nice=10
+IOSchedulingClass=idle
+StandardOutput=journal
+StandardError=journal

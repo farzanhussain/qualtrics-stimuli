@@ -29,4 +29,5 @@ include = [
     "src/rednote_kb/db/schema.sql",
     "src/rednote_kb/site/templates/*.html",
     "src/rednote_kb/site/static/*",
+    "src/rednote_kb/site/pwa/*",
 ]
