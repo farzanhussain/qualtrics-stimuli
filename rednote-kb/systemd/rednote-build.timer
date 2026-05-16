@@ -1,0 +1,12 @@
+[Unit]
+Description=Run rednote-build.service every 6 hours
+
+[Timer]
+OnBootSec=2min
+OnCalendar=*-*-* 02,08,14,20:00:00
+RandomizedDelaySec=10min
+Persistent=true
+Unit=rednote-build.service
+
+[Install]
+WantedBy=timers.target

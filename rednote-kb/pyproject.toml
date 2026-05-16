@@ -1,0 +1,33 @@
+[project]
+name = "rednote-kb"
+version = "0.0.1"
+description = "Personal knowledge base over RedNote (Xiaohongshu) content"
+requires-python = ">=3.11"
+dependencies = [
+    "typer>=0.12",
+    "jinja2>=3.1",
+    "python-dotenv>=1.0",
+]
+
+[project.scripts]
+rednote-kb = "rednote_kb.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rednote_kb"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
+
+[tool.hatch.build]
+include = [
+    "src/rednote_kb/db/schema.sql",
+    "src/rednote_kb/site/templates/*.html",
+    "src/rednote_kb/site/static/*",
+    "src/rednote_kb/site/pwa/*",
+]

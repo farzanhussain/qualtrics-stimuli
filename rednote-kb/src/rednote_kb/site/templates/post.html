@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title or post.id }} · 小红书 KB{% endblock %}
+{% block main %}
+<article class="post">
+  <p><a class="back" href="../index.html">← 搜索</a></p>
+  {% if post.title %}<h1>{{ post.title }}</h1>{% endif %}
+  <p class="byline">
+    {% if post.author %}<span>{{ post.author }}</span>{% endif %}
+    {% if post.published_at %}<time>{{ post.published_at }}</time>{% endif %}
+  </p>
+  {% if post.thumb %}<img class="thumb" src="../{{ post.thumb }}" alt="">{% endif %}
+  {% if post.body %}<div class="body">{{ post.body }}</div>{% endif %}
+  {% if post.tags %}
+  <ul class="tags">
+    {% for t in post.tags %}<li>#{{ t }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% if post.ocr_text %}
+  <details class="ocr">
+    <summary>图片文字</summary>
+    <pre>{{ post.ocr_text }}</pre>
+  </details>
+  {% endif %}
+  <p class="open"><a href="{{ post.url }}" rel="noopener noreferrer">在小红书打开 ↗</a></p>
+  <p class="meta">fetched {{ post.fetched_at }}</p>
+</article>
+{% endblock %}
