@@ -78,6 +78,7 @@ def test_build_from_fixture(tmp_path: Path) -> None:
     assert (dist / "static" / "search.js").exists()
     assert (dist / "static" / "style.css").exists()
     assert (dist / "robots.txt").read_text("utf-8").startswith("User-agent: *")
+    assert (dist / ".nojekyll").exists(), "GitHub Pages must skip Jekyll"
 
 
 def test_upsert_is_idempotent(tmp_path: Path) -> None:

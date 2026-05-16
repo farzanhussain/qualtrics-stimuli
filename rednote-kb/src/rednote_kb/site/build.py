@@ -179,6 +179,9 @@ def build(db_path: Path, dist: Path) -> dict:
     _copy_static(dist)
     _copy_pwa(dist)
     (dist / "robots.txt").write_text("User-agent: *\nDisallow: /\n", encoding="utf-8")
+    # Bypass Jekyll on GitHub Pages so files starting with '_' (none today, but
+    # cheap insurance) and our raw static assets are served as-is.
+    (dist / ".nojekyll").write_text("", encoding="utf-8")
 
     return {"posts": len(posts), "tokens": len(tok_index),
             "built_at": built_at, "stats": st}
