@@ -16,6 +16,9 @@ const SHELL = [
   './static/search.js',
   './manifest.webmanifest',
   './icon.svg',
+  './icon-180.png',
+  './icon-192.png',
+  './icon-512.png',
 ];
 
 self.addEventListener('install', e => {
@@ -40,11 +43,18 @@ function isSameOrigin(url) {
   return url.origin === self.location.origin;
 }
 
+// QuotaExceededError on cache.put would otherwise reject the fetch promise and
+// surface as a broken page even though the network response was fine. Swallow
+// cache write failures — losing a cache entry is acceptable; losing the page is not.
+async function safePut(cache, req, res) {
+  try { await cache.put(req, res); } catch (_err) { /* quota / blocked: skip */ }
+}
+
 async function networkFirst(req, cacheName) {
   const cache = await caches.open(cacheName);
   try {
     const fresh = await fetch(req, { cache: 'no-cache' });
-    if (fresh && fresh.ok) cache.put(req, fresh.clone());
+    if (fresh && fresh.ok) await safePut(cache, req, fresh.clone());
     return fresh;
   } catch (err) {
     const cached = await cache.match(req);
@@ -56,8 +66,8 @@ async function networkFirst(req, cacheName) {
 async function staleWhileRevalidate(req, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(req);
-  const fetchPromise = fetch(req).then(res => {
-    if (res && res.ok) cache.put(req, res.clone());
+  const fetchPromise = fetch(req).then(async res => {
+    if (res && res.ok) await safePut(cache, req, res.clone());
     return res;
   }).catch(() => cached);
   return cached || fetchPromise;
@@ -77,7 +87,7 @@ self.addEventListener('fetch', e => {
     if (hit) return hit;
     try {
       const res = await fetch(e.request);
-      if (res && res.ok) cache.put(e.request, res.clone());
+      if (res && res.ok) await safePut(cache, e.request, res.clone());
       return res;
     } catch (err) {
       if (e.request.mode === 'navigate') return cache.match('./index.html');

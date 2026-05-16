@@ -23,8 +23,20 @@ if [ ! -d "$SITE_REPO_DIR/.git" ]; then
   exit 1
 fi
 
-# Mirror dist/ into the site repo, deleting stale files, but keep .git intact.
-rsync -a --delete --exclude=.git/ "$DIST_DIR"/ "$SITE_REPO_DIR"/
+# Mirror dist/ into the site repo, deleting stale files.
+# Excludes:
+#   - .git/         : keep the repo itself
+#   - .github/      : Actions workflows live in the site repo, not in dist/
+#   - CNAME         : custom-domain config; deleting it un-configures the domain
+#   - .nojekyll     : tells Pages to skip Jekyll (preserves files starting with _)
+#   - README.md     : the site repo may have its own root README distinct from dist/
+rsync -a --delete \
+  --exclude=.git/ \
+  --exclude=.github/ \
+  --exclude=CNAME \
+  --exclude=.nojekyll \
+  --exclude=README.md \
+  "$DIST_DIR"/ "$SITE_REPO_DIR"/
 
 cd "$SITE_REPO_DIR"
 git add -A

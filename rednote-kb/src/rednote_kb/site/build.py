@@ -48,6 +48,16 @@ def _excerpt(body: str, limit: int = EXCERPT_CHARS) -> str:
     return body if len(body) <= limit else body[:limit].rstrip() + "…"
 
 
+def _safe_url(url: str | None) -> str:
+    """Allowlist: only http(s):// URLs survive into rendered href attributes.
+    Defends against `javascript:` / `data:` URIs in case upstream data is ever
+    tampered with — Jinja2 autoescape doesn't catch scheme-based XSS."""
+    if not url:
+        return ""
+    s = str(url).strip()
+    return s if s.startswith(("https://", "http://")) else ""
+
+
 def _row_to_record(row, thumbs: list[str]) -> dict:
     try:
         tags = json.loads(row["tags"]) if row["tags"] else []
@@ -60,7 +70,7 @@ def _row_to_record(row, thumbs: list[str]) -> dict:
 
     return {
         "id":            row["id"],
-        "url":           row["url"],
+        "url":           _safe_url(row["url"]),
         "title":         title,
         "body":          body,                 # stripped before serialising for search index
         "body_excerpt":  _excerpt(body),
@@ -81,7 +91,13 @@ def _row_to_record(row, thumbs: list[str]) -> dict:
 
 
 def _build_inverted_index(posts: list[dict]) -> dict[str, list[int]]:
-    """token → sorted list of post indices that contain it in any field."""
+    """token → list of post indices that contain it in any field.
+
+    Posting lists MUST be sorted ascending — `intersectSorted` in search.js
+    relies on this. The current implementation produces sorted lists because we
+    iterate posts in order and only append, but the invariant is enforced below
+    so future refactors (set unions, comprehensions) can't break it silently.
+    """
     idx: dict[str, list[int]] = {}
     for i, p in enumerate(posts):
         seen: set[str] = set()
@@ -91,6 +107,8 @@ def _build_inverted_index(posts: list[dict]) -> dict[str, list[int]]:
                     continue
                 seen.add(tok)
                 idx.setdefault(tok, []).append(i)
+    for tok, indices in idx.items():
+        assert indices == sorted(indices), f"posting list for {tok!r} not sorted"
     return idx
 
 

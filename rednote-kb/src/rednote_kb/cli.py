@@ -58,7 +58,7 @@ def ingest_json(
     source: str = typer.Option("manual", help="'creator' | 'seed_query' | 'manual'"),
     db: Path = DEFAULT_DB,
 ) -> None:
-    """Ingest pre-scraped posts (see scrape/xhs_client.py for the schema)."""
+    """Ingest pre-scraped posts (see src/rednote_kb/scrape/xhs_client.py for the schema)."""
     files = list(xhs_client.iter_post_files(path))
     if not files:
         typer.echo(f"no .json files under {path}", err=True)

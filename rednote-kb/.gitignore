@@ -4,11 +4,5 @@ __pycache__/
 *.pyc
 *.egg-info/
 dist/
-data/rednote.db
-data/rednote.db-journal
-data/rednote.db-wal
-data/rednote.db-shm
-data/media/
-data/thumbs/
-data/models/
+data/
 .DS_Store

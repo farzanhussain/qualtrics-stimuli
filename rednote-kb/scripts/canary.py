@@ -25,9 +25,15 @@ import traceback
 from datetime import datetime, timezone
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from rednote_kb.db import dao
 from rednote_kb.index.tokenize import tokenize
 from rednote_kb.site import build as site_build
+
+# CLI auto-loads .env via typer; the canary runs standalone under systemd,
+# so load it explicitly or REDNOTE_DB / paths silently fall back to defaults.
+load_dotenv()
 
 
 def main() -> int:

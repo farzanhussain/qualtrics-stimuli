@@ -70,6 +70,11 @@ def test_build_from_fixture(tmp_path: Path) -> None:
     assert (dist / "manifest.webmanifest").exists()
     assert (dist / "sw.js").exists()
     assert (dist / "icon.svg").exists()
+    # PNG icons for iOS Safari (SVG isn't reliably honoured for apple-touch-icon).
+    for size in (180, 192, 512):
+        png = dist / f"icon-{size}.png"
+        assert png.exists(), f"missing {png.name}"
+        assert png.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"), f"{png.name} not a valid PNG"
     assert (dist / "static" / "search.js").exists()
     assert (dist / "static" / "style.css").exists()
     assert (dist / "robots.txt").read_text("utf-8").startswith("User-agent: *")
